@@ -14,12 +14,6 @@ app.use(express.static("public"))
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-var temp  = [
-  {
-    Notes:"",
-    data: ""
-  }
-]
 
 
 // Basic route that sends the user first to the AJAX Page
@@ -34,14 +28,26 @@ app.get("/", function(req, res) {
   });
 
   app.get("/api/notes", function(req, res) {
-    res.sendFile(path.join(__dirname, "db/db.json"));
+    res.sendFile(path.join(__dirname, "./db/db.json"));
+
+
   });
 
   app.post("/api/notes", function(req, res){
-    fs.appendFile('db.json', res.body, function (err) {
-      if (err) throw err;
-      console.log('Saved!');
-    });
+    var finalData;
+    fs.readFile("db/db.json", function(err, data){
+      var newEntry = req.body;
+      finalData = JSON.parse(data);
+      finalData.push(newEntry)
+      JSON.stringify(finalData)
+      if(err)throw err;
+
+      fs.writeFile('./db/db.json', JSON.stringify(finalData), function (err) {
+        if (err) throw err;
+        console.log('Saved!');
+      });
+    })
+    
     
   })
 
